@@ -1,0 +1,79 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+	compatible = "brcm,bcm2708", "brcm,bcm2835";
+
+	fragment@0 {
+		target-path = "/";
+		__overlay__ {
+			sgtl5000_3v3: sgtl5000_3v3 {
+				compatible = "regulator-fixed";
+				regulator-name = "sgtl5000-3v3";
+				regulator-min-microvolt = <3300000>;
+				regulator-max-microvolt = <3300000>;
+				regulator-always-on;
+				regulator-boot-on;
+			};
+		};
+	};
+
+	fragment@1 {
+		target-path = "/";
+		__overlay__ {
+			sgtl5000_mclk: sgtl5000_mclk {
+				compatible = "fixed-clock";
+				#clock-cells = <0>;
+				clock-frequency = <12288000>;
+			};
+		};
+	};
+
+	fragment@2 {
+		target = <&i2s>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+
+	fragment@3 {
+		target = <&i2c1>;
+		__overlay__ {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			status = "okay";
+
+			sgtl5000: codec@a {
+				compatible = "fsl,sgtl5000";
+				reg = <0x0a>;
+				#sound-dai-cells = <0>;
+				clocks = <&sgtl5000_mclk>;
+				VDDA-supply = <&sgtl5000_3v3>;
+				VDDIO-supply = <&sgtl5000_3v3>;
+				status = "okay";
+			};
+		};
+	};
+
+	fragment@4 {
+		target-path = "/";
+		__overlay__ {
+			sound {
+				compatible = "simple-audio-card";
+				simple-audio-card,name = "cm3-sgtl5000";
+				simple-audio-card,format = "i2s";
+				simple-audio-card,bitclock-master = <&codec_master>;
+				simple-audio-card,frame-master = <&codec_master>;
+				status = "okay";
+
+				simple-audio-card,cpu {
+					sound-dai = <&i2s>;
+				};
+
+				codec_master: simple-audio-card,codec {
+					sound-dai = <&sgtl5000>;
+				};
+			};
+		};
+	};
+};
