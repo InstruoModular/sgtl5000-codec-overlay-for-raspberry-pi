@@ -1,3 +1,5 @@
+The driver for the audio codec SGTL5000 is included in the kernel code base for raspianOS. All that is missing to use this codec is the overlay. This overley here has been compiled and tested for use with raspberry pi CM3 module.
+
 To compile use following command on the raspberry pi for the sgtl5000 overlay.
 
 dtc -@ -I dts -O dtb -o sgtl5000-audio.dtbo sgtl5000-audio-overlay.dts
